@@ -284,6 +284,23 @@ abstract class QueryBuilderFilter
                             }
 
                             break;
+                        case 'range':
+                            if (isset($values['from']) && isset($values['to'])) {
+                                if ($values['from'] <= $values['to']) {
+                                    $this->builder = $builder->whereBetween($mapping, [$values['from'], $values['to']]);
+                                } else {
+                                    throw new \InvalidArgumentException("Значение поля 'От' должно быть меньше или равно значению поля 'До'. Пожалуйста, убедитесь, что указанный диапазон корректен.");
+                                }
+                            } elseif (isset($values['from'])) {
+                                $this->builder = $builder->where($mapping, '>=', $values['from'])->orWhere(function ($query) use ($mapping, $values) {
+                                    if ((int)$values['from'] === 0) {
+                                        $query->orWhereNull($mapping);
+                                    }
+                                });
+                            } elseif (isset($values['to'])) {
+                                $this->builder = $builder->where($mapping, '<=', $values['to'])->orWhereNull($mapping);
+                            }
+                            break;
                     }
                 }
             }
