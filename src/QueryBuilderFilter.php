@@ -142,11 +142,10 @@ abstract class QueryBuilderFilter
                         continue;
                     }
 
-                    if ($type === 'array') {
-                        $this->builder = $builder->whereIn($mapping, $values);
-                    }
-
                     switch ($type) {
+                        case 'array':
+                            $this->builder = $builder->whereIn($mapping, $values);
+                            break;
                         case 'strict-text':
                             if (isset($userOperation) && ($userOperation === 'in')) {
                                 $val = trim($val);
